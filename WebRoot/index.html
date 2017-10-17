@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="云宝">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>java多国语言互译系统</title>
+  <style type= "text/css">
+		*{margin: 0;padding: 0;}
+	   #head{width: 100%;height: 60px;background: rgba(0,0,0,0.5);color: #fff;text-align:center;}
+	   #body{width: 100%; height: 100vh;background: url(img/bg.jpg)no-repeat; background-size: cover;line-height: 60px; font-size:24px;}
+	   #content{width: 642px;height: 363px;margin: 150px auto; }
+	   #content .c_top{width: 594px; height: 50px; border: 4px solid rgba(141,139,136,0.4);background: rgba(0,0,0,0.2);outline: none;padding: 20px; font-size: 19px;color: #555;}
+	   #content .c_center{width: 600px; height: 63px; margin: 12px  auto;}
+	   #content .c_center select{width: 180px; height: 40px; font-size: 18px;padding-left:20px;outline: none;}
+	   #content .c_center select option{width: ; height: ;}
+	   #content .c_center img{margin: 0 10px -10px 10px;}
+	   #content .c_center .btn{width: 120px;height: 44px; background:#7dcce4; display: inline-block; text-align: center; line-height: 40px; color: #fff;text-decoration: none;margin-left: 20px;}
+	   #content .c_footer{width: 595px;height: 195px;border: 4px solid rgba(141,139,136,0.4); padding: 20px;color: #5fd730;font-size: 20px;font-weight: bold;position: relative;}
+	   #content .c_footer .sound{width: 19px;height:17px;background: url(img/sound-1.png); position:absolute;bottom: 10px; right:20px;cursor: pointer;}
+	   #content .c_footer .sound:hover{background: url(img/sound-2.png);}
+	   /*#content .c_footer .sound:hover{background: url(img/sound-3.png);}*/
+  </style>
+ </head>
+
+ <body id="body">
+	<div id="head">Java  开发多国语言互译系统</div>
+
+	<div id="content">  
+		<input class="c_top"></input>
+		<div class="c_center"> 
+			<select name="from" id="from">
+				<option value="auto"> 智能识别</option>
+				<option value="zh">中文</option>
+				<option value="wyw">文言文</option>
+				<option value="yue">粤语</option>
+				<option value="en">英语</option>
+				<option value="ru">俄语</option>
+				<option value="de">德语</option>
+				<option value="kor">韩语</option>
+				<option value="fra">法语</option>
+				<option value="th">泰语</option>
+				<option value="it">意大利语</option>
+				<option value="el">希腊语</option>
+				<option value="pl">波兰语</option>
+				<option value="vie">越南语</option>
+				<option value="dan">丹麦语</option>
+				<option value="fin">芬兰语</option>
+				<option value="swe">瑞典语</option>
+				<option value="cht">繁体中文</option>
+				<option value="jp">日语</option>
+			</select>
+			<img src="img\sign_in.png" alt="箭头" width="32" height="32" ></img>
+				<select name="to" id="to">
+					<option value="en">英语</option>
+					<option value="zh">中文</option>
+					<option value="wyw">文言文</option>
+					<option value="jp">日语</option>
+					<option value="yue">粤语</option>
+					<option value="ru">俄语</option>
+					<option value="de">德语</option>
+					<option value="kor">韩语</option>
+					<option value="fra">法语</option>
+					<option value="th">泰语</option>
+					<option value="it">意大利语</option>
+					<option value="el">希腊语</option>
+					<option value="pl">波兰语</option>
+					<option value="vie">越南语</option>
+					<option value="dan">丹麦语</option>
+					<option value="fin">芬兰语</option>
+					<option value="swe">瑞典语</option>
+					<option value="cht">繁体中文</option>
+			    </select>
+				<a href="javascript:query()" class="btn">翻译</a>
+		</div>
+		<div class="c_footer" >
+			<div class="sound"></div>
+		</div> 
+	</div>
+	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" >
+		$(function(){
+		/*alert("wq vb kb");*/
+			$(".btn").click(function(){
+				query(); 	//调用查询方法
+			});
+		});
+		
+		function query(){    //查询方法
+			var text = $(".c_top").val(); 	/*获取要翻译 的值*/
+			var from = $("#from").val();      /*获取要从。。。翻译到*/
+			var to = $("#to").val();   		/*翻译 为 。。。。*/
+			//alert(text+"--"+from+"--"+to); //测试前台输入输出
+			$.ajax({						 /*异步请求*/
+				type:"post",
+				url:"query",   /*路径与后台的xml中的所有的servlet-name和url-pattern相对应*/
+				data:{"text":text,"from":from,"to":to},//传入后台   json格式
+				success:function(data){   //data为回调参数 
+					//alert(data);
+					data = $.parseJSON(data);
+					//alert(data.trans_result[0].dst);
+					var content = data.trans_result[0].dst;
+					$(".c_footer").html(content);
+					
+					var str = content.replace(/\s/g,"_");  //正则表达式    "\s" 匹配空格 替换成"_"
+					if(to == "wyw"){
+						to="zh";
+					}else if(to == "yue"){
+						to="cte";
+					}
+					
+					var obj = $('<audio  src=http://fanyi.baidu.com/gettts?lan='+to+'&text='+str+'&spd=5&source=web autoplay></audio>');
+					$("audio").remove();
+					$("body").append(obj);
+				}
+			});
+		 }
+		
+		$(document).keydown(function(event){
+			if(event.keyCode == 13){
+				query();
+			}
+		});
+	</script>
+ </body>
+</html>
